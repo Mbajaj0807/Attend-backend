@@ -1,0 +1,58 @@
+[2025-09-24T06:41:41.199Z] === Attendance API Request Test Started ===
+[2025-09-24T06:41:41.203Z] Starting attendance request...
+[2025-09-24T06:41:41.203Z] Request Configuration:
+{
+  "url": "https://student.bennetterp.camu.in/api/Attendance/record-online-attendance",
+  "method": "POST",
+  "headers": {
+    "Accept": "*/*",
+    "Content-Type": "application/json",
+    "Accept-Encoding": "gzip, deflate, br",
+    "Accept-Language": "en-IN,en-GB;q=0.9,en;q=0.8",
+    "User-Agent": "MyCamu/2 CFNetwork/1568.100.1.2.1 Darwin/24.0.0",
+    "Token": "",
+    "Cache-Control": "no-cache",
+    "Cookie": "connect.sid=s%3AO8RR8KCtS_5VVsuYTh8CWW6CXn0VkoE2.kCTMHYol6NdVwRIoRn76NVBpu0ZheacIN0dPyAbG9Jg",
+    "Host": "student.bennetterp.camu.in",
+    "Content-Length": 144
+  },
+  "body": {
+    "attendanceId": "68d26680e00242880f82fe41_68d26a330ada8529e692b517",
+    "StuID": "668c1a08b26adcc7e79eaefa",
+    "offQrCdEnbld": true,
+    "isBatchClass": false
+  }
+}
+[2025-09-24T06:41:41.243Z] Sending request body:
+"{\"attendanceId\":\"68d26680e00242880f82fe41_68d26a330ada8529e692b517\",\"StuID\":\"668c1a08b26adcc7e79eaefa\",\"offQrCdEnbld\":true,\"isBatchClass\":false}"
+[2025-09-24T06:41:41.244Z] Request sent. Check console and attendance_request.log file for detailed logs.
+[2025-09-24T06:41:41.369Z] Response Status: 200 OK
+[2025-09-24T06:41:41.371Z] Response Headers:
+{
+  "date": "Wed, 24 Sep 2025 06:41:40 GMT",
+  "content-type": "application/json; charset=utf-8",
+  "content-length": "90",
+  "connection": "keep-alive",
+  "server": "nginx/1.26.3",
+  "strict-transport-security": "max-age=31536000; includeSubDomains; preload",
+  "x-xss-protection": "1; mode=block",
+  "x-content-type-options": "nosniff",
+  "x-frame-options": "SAMEORIGIN",
+  "content-security-policy": "frame-ancestors 'self' https://staff.bennetterp.camu.in https://www.teacher.camu.in staff.bennetterp.camu.in staff.aaft.com;",
+  "set-cookie": [
+    "connect.sid=s%3AO8RR8KCtS_5VVsuYTh8CWW6CXn0VkoE2.kCTMHYol6NdVwRIoRn76NVBpu0ZheacIN0dPyAbG9Jg; Path=/; Expires=Fri, 24 Oct 2025 06:41:40 GMT; HttpOnly; Secure; SameSite=None"
+  ],
+  "vary": "Accept-Encoding"
+}
+[2025-09-24T06:41:41.373Z] Response received. Status: 200
+[2025-09-24T06:41:41.373Z] Parsed Response Body:
+{
+  "output": {
+    "data": {
+      "isMeetingStarted": false,
+      "code": "ATTENDANCE_NOT_VALID"
+    },
+    "errors": null
+  }
+}
+[2025-09-24T06:41:41.374Z] ✅ SUCCESS: Request completed successfully
