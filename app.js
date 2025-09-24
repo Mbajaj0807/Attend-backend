@@ -12,6 +12,7 @@ app.use(express.json());
 // Enable CORS for your frontend
 app.use(cors({
     origin: 'http://localhost:5173', // React dev server URL
+    origin: 'https://attend-frontend-chi.vercel.app',
     credentials: true               // allow cookies
 }));
 
