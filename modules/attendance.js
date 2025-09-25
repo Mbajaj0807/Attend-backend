@@ -73,7 +73,8 @@ router.post('/mark-all-present', async (req, res) => {
                 data: responseData,
                 success: response.ok
             });
-            console.log(`Attendance marked for ${email}. Status: ${response.status}`);
+            console.log(`Attendance for ${email}. Status: ${responseData.output.data.code}`);
+            
 
         } catch (error) {
             console.error(`Error marking attendance for ${email}:`, error);
