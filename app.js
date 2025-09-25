@@ -9,13 +9,13 @@ const { connectToDatabase } = require('./config/database');
 
 app.use(express.json());
 
-// Enable CORS for your frontend - FIXED: Use array for multiple origins
+// Enable CORS only for your deployed frontend
 app.use(cors({
-    origin: [
-        'http://localhost:5173', // React dev server URL
-        'https://attend-frontend-chi.vercel.app'
-    ],
-    credentials: true // allow cookies
+    origin: 'https://attend-frontend-chi.vercel.app', // Only your frontend domain
+    credentials: true, // allow cookies
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization', 'Origin', 'Accept'],
+    optionsSuccessStatus: 200
 }));
 
 // Use the routes
@@ -33,7 +33,8 @@ async function startServer() {
         // Then start the server
         const PORT = process.env.PORT || 3000;
         app.listen(PORT, () => {
-            console.log(`Server running on http://localhost:${PORT}`);
+            console.log(`Server running on port ${PORT}`);
+            console.log(`CORS enabled for: https://attend-frontend-chi.vercel.app`);
         });
     } catch (error) {
         console.error('Failed to start server:', error);
