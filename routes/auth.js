@@ -1,3 +1,4 @@
+// routes/auth.js
 const express = require('express');
 const router = express.Router();
 const { login, getAuth } = require('../modules/login');
@@ -6,11 +7,12 @@ const { login, getAuth } = require('../modules/login');
 router.post('/login', async (req, res) => {
     try {
         const { email, password } = req.body;
-        const { cookie, progressionData } = await login(email, password);
+        const { cookie, progressionData, stuid } = await login(email, password);
         res.json({ 
             message: 'Logged in successfully', 
             cookie, 
-            progressionData 
+            progressionData,
+            stuid 
         });
     } catch (err) {
         res.status(500).json({ error: err.message });
@@ -21,7 +23,7 @@ router.post('/login', async (req, res) => {
 router.get('/student/:email', async (req, res) => {
     try {
         const { email } = req.params;
-        const auth = getAuth(email);
+        const auth = await getAuth(email);
 
         if (!auth) {
             return res.status(404).json({ error: 'No stored auth found for this email' });
@@ -30,7 +32,8 @@ router.get('/student/:email', async (req, res) => {
         res.json({ 
             email,
             cookie: auth.cookie,
-            progressionData: auth.progressionData 
+            progressionData: auth.progressionData,
+            stuid: auth.stuid
         });
     } catch (err) {
         res.status(500).json({ error: err.message });

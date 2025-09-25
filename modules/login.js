@@ -1,47 +1,85 @@
+// modules/login.js
 const axios = require('axios');
-const fs = require('fs');
-const path = require('path');
-
-const COOKIE_PATH = path.join(__dirname, '../cookies.json');
+const { connectToDatabase } = require('../config/database');
 
 // Save auth info for a specific email, keeping existing ones
-function saveAuth(email, cookie, progressionData, stuid) {
+async function saveAuth(email, cookie, progressionData, stuid) {
     const normalizedEmail = email.toLowerCase(); // normalize
-    let allAuth = {};
-    if (fs.existsSync(COOKIE_PATH)) {
-        allAuth = JSON.parse(fs.readFileSync(COOKIE_PATH));
-    }
-
-    // Only save if email doesn't already exist
-    if (!allAuth[normalizedEmail]) {
-        allAuth[normalizedEmail] = {
-            cookie,
-            progressionData,
-            stuid
-        };
-        fs.writeFileSync(COOKIE_PATH, JSON.stringify(allAuth, null, 2));
-        console.log(`Auth saved for ${normalizedEmail}`);
-    } else {
-        console.log(`Auth for ${normalizedEmail} already exists. Not updating cookies.`);
+    
+    try {
+        const db = await connectToDatabase();
+        const collection = db.collection('user_auth');
+        
+        // Check if email already exists
+        const existingUser = await collection.findOne({ email: normalizedEmail });
+        
+        if (!existingUser) {
+            await collection.insertOne({
+                email: normalizedEmail,
+                cookie,
+                progressionData,
+                stuid,
+                createdAt: new Date(),
+                updatedAt: new Date()
+            });
+            console.log(`Auth saved for ${normalizedEmail}`);
+        } else {
+            console.log(`Auth for ${normalizedEmail} already exists. Not updating.`);
+        }
+    } catch (error) {
+        console.error(`Error saving auth for ${normalizedEmail}:`, error);
+        throw error;
     }
 }
 
 // Get stored auth info for specific email
-function getAuth(email) {
+async function getAuth(email) {
     const normalizedEmail = email.toLowerCase(); // normalize
-    if (fs.existsSync(COOKIE_PATH)) {
-        const allAuth = JSON.parse(fs.readFileSync(COOKIE_PATH));
-        const auth = allAuth[normalizedEmail];
-        if (auth) {
-            // Return cookie, progressionData, and stuid
+    
+    try {
+        const db = await connectToDatabase();
+        const collection = db.collection('user_auth');
+        
+        const user = await collection.findOne({ email: normalizedEmail });
+        
+        if (user) {
             return {
-                cookie: auth.cookie,
-                progressionData: auth.progressionData,
-                stuid: auth.stuid
+                cookie: user.cookie,
+                progressionData: user.progressionData,
+                stuid: user.stuid
             };
         }
+        
+        return null;
+    } catch (error) {
+        console.error(`Error getting auth for ${normalizedEmail}:`, error);
+        throw error;
     }
-    return null;
+}
+
+// Get all stored auth data (for attendance marking)
+async function getAllAuth() {
+    try {
+        const db = await connectToDatabase();
+        const collection = db.collection('user_auth');
+        
+        const users = await collection.find({}).toArray();
+        
+        // Convert to the format expected by attendance.js
+        const allAuth = {};
+        users.forEach(user => {
+            allAuth[user.email] = {
+                cookie: user.cookie,
+                progressionData: user.progressionData,
+                stuid: user.stuid
+            };
+        });
+        
+        return allAuth;
+    } catch (error) {
+        console.error('Error getting all auth data:', error);
+        throw error;
+    }
 }
 
 // Login function
@@ -49,7 +87,7 @@ async function login(email, password) {
     const normalizedEmail = email.toLowerCase(); // normalize
 
     // Check if email already has auth stored
-    const existingAuth = getAuth(normalizedEmail);
+    const existingAuth = await getAuth(normalizedEmail);
     if (existingAuth) {
         console.log(`User ${normalizedEmail} already logged in. Returning stored auth.`);
         return existingAuth;
@@ -82,7 +120,7 @@ async function login(email, password) {
         const progression = userRecord.output?.data?.progressionData?.[0];
         const stuid = userRecord.output?.data?.logindetails?.Student?.[0]?.StuID;
 
-        if (!progression) throw new Error('No progression data found');
+        if (!progression) throw new Error('Login Failed');
         if (!stuid) throw new Error('No StuID found');
 
         const progressionData = {
@@ -93,7 +131,7 @@ async function login(email, password) {
             SemID: progression.SemID
         };
 
-        saveAuth(normalizedEmail, cookieStr, progressionData, stuid);
+        await saveAuth(normalizedEmail, cookieStr, progressionData, stuid);
 
         return { cookie: cookieStr, progressionData, stuid };
 
@@ -103,4 +141,4 @@ async function login(email, password) {
     }
 }
 
-module.exports = { login, getAuth };
+module.exports = { login, getAuth, getAllAuth };

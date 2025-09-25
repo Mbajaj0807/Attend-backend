@@ -1,7 +1,7 @@
+// modules/attendance.js
 const express = require('express');
-const fs = require('fs').promises;
 const fetch = require('node-fetch');
-const path = require('path');
+const { getAllAuth } = require('./login');
 
 const router = express.Router();
 
@@ -14,19 +14,22 @@ router.post('/mark-all-present', async (req, res) => {
         return res.status(400).json({ error: 'attendanceId is required in the request body.' });
     }
 
-    // 2. Read the cookie.json file
+    // 2. Get all user auth data from MongoDB
     let cookieData;
     try {
-        const data = await fs.readFile(path.join(__dirname, '../cookies.json'), 'utf8');
-        cookieData = JSON.parse(data);
+        cookieData = await getAllAuth();
     } catch (error) {
-        console.error('Error reading or parsing cookie.json:', error);
-        return res.status(500).json({ error: 'Failed to read user data. Check if cookie.json exists and is valid.' });
+        console.error('Error reading user data from MongoDB:', error);
+        return res.status(500).json({ error: 'Failed to read user data from database.' });
     }
 
     // 3. Prepare an array to store the results of each API call
     const results = [];
     const userEmails = Object.keys(cookieData);
+
+    if (userEmails.length === 0) {
+        return res.status(400).json({ error: 'No users found in database.' });
+    }
 
     // 4. Use Promise.all to send all requests concurrently
     const promises = userEmails.map(async (email) => {
