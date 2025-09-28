@@ -11,7 +11,7 @@ app.use(express.json());
 
 // Enable CORS only for your deployed frontend
 app.use(cors({
-    origin: '0.0.0.0/0', // Allow all origins
+    origin: 'https://todo-app-lime-alpha.vercel.app', // Allow  origins
     credentials: true, // allow cookies
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
     allowedHeaders: ['Content-Type', 'Authorization', 'Origin', 'Accept'],
