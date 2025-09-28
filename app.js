@@ -11,7 +11,7 @@ app.use(express.json());
 
 // Enable CORS only for your deployed frontend
 app.use(cors({
-    origin: process.env.FRONTEND_URL, // Only your frontend domain
+    origin: '0.0.0.0/0', // Allow all origins
     credentials: true, // allow cookies
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
     allowedHeaders: ['Content-Type', 'Authorization', 'Origin', 'Accept'],
@@ -34,7 +34,7 @@ async function startServer() {
         const PORT = process.env.PORT || 3000;
         app.listen(PORT, () => {
             console.log(`Server running on port ${PORT}`);
-            console.log(`CORS enabled for: http://localhost:5173/`);
+            console.log(`CORS enabled for: ${process.env.FRONTEND_URL}`);
         });
     } catch (error) {
         console.error('Failed to start server:', error);
